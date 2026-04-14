@@ -11,13 +11,15 @@
 .def cont2       = r21
 .def cont3       = r22
 .def cond_count  = r23
+.def ruido_hold  = r24
 
 ; ==================================================
-; Umbrales de detección
+; Umbrales de detección y retención de ruido
 ; ==================================================
 .equ UMBRAL_TEMP   = 15
 .equ UMBRAL_LUZ    = 80
 .equ UMBRAL_RUIDO  = 30
+.equ HOLD_RUIDO    = 20
 
 ; ==================================================
 ; Vector de reset
@@ -56,6 +58,9 @@ RESET:
     lds temp, PORTH
     andi temp, 0b10011111
     sts PORTH, temp
+
+    ; Inicialización de retención de ruido
+    clr ruido_hold
 
     ; Configuración del ADC:
     ; Referencia AVcc
@@ -149,10 +154,26 @@ ESPERA_ADC_RUIDO:
 
     lds adc_ruido, ADCH
 
+    ; Si hay ruido real, recargar retención
     cpi adc_ruido, UMBRAL_RUIDO
-    brlo SIN_RUIDO
+    brlo REVISAR_HOLD_RUIDO
 
-CON_RUIDO:
+CON_RUIDO_REAL:
+    ldi ruido_hold, HOLD_RUIDO
+
+    lds temp, PORTH
+    ori temp, (1<<6)
+    sts PORTH, temp
+
+    inc cond_count
+    rjmp EVALUAR_ALARMA
+
+REVISAR_HOLD_RUIDO:
+    cpi ruido_hold, 0
+    breq SIN_RUIDO
+
+    dec ruido_hold
+
     lds temp, PORTH
     ori temp, (1<<6)
     sts PORTH, temp
@@ -167,51 +188,23 @@ SIN_RUIDO:
 
 EVALUAR_ALARMA:
     ; ==================================================
-    ; Evaluación de alarma general
+    ; Lógica de alarma general
     ;
     ; 3 condiciones:
-    ;   - parpadeo de 3 LEDs y buzzer
-    ; 2 condiciones:
+    ;   - LEDs permanecen encendidos
     ;   - buzzer intermitente
-    ; 0 o 1 condición:
+    ;
+    ; 0, 1 o 2 condiciones:
     ;   - buzzer apagado
     ; ==================================================
     cpi cond_count, 3
     breq ALARMA_TOTAL
 
-    cpi cond_count, 2
-    breq ALARMA_DOS
-
     rjmp BUZZER_OFF
 
 ALARMA_TOTAL:
-    ; Encendido simultáneo de LEDs y buzzer
-    ; Se conserva el estado del ventilador
-    lds temp, PORTB
-    ori temp, (1<<6) | (1<<4)
-    sts PORTB, temp
-
-    lds temp, PORTH
-    ori temp, (1<<6) | (1<<5)
-    sts PORTH, temp
-
-    rcall RETARDO_ALARMA
-
-    ; Apagado temporal de LEDs y buzzer
-    lds temp, PORTB
-    andi temp, 0b10101111
-    sts PORTB, temp
-
-    lds temp, PORTH
-    andi temp, 0b10011111
-    sts PORTH, temp
-
-    rcall RETARDO_ALARMA
-
-    rjmp LOOP
-
-ALARMA_DOS:
-    ; Buzzer intermitente con dos condiciones activas
+    ; Mantener encendidos los LEDs ya activados
+    ; Activar buzzer de forma intermitente
     lds temp, PORTH
     ori temp, (1<<5)
     sts PORTH, temp
@@ -227,25 +220,25 @@ ALARMA_DOS:
     rjmp LOOP
 
 BUZZER_OFF:
-    ; Buzzer apagado con menos de dos condiciones
+    ; Buzzer apagado con 0, 1 o 2 condiciones
     lds temp, PORTH
     andi temp, 0b11011111
     sts PORTH, temp
 
-    ; Retención visual del LED rojo cuando solo hubo evento de ruido
-    cpi adc_ruido, UMBRAL_RUIDO
-    brlo SIN_RETARDO
+    ; Si hay ruido activo, mantenerlo visible un poco
+    cpi ruido_hold, 0
+    breq FIN_LOOP
 
     rcall RETARDO_RUIDO
 
-SIN_RETARDO:
+FIN_LOOP:
     rjmp LOOP
 
 ; ==================================================
-; Retardo de retención para indicador de ruido
+; Retardo corto para mantener visible el LED de ruido
 ; ==================================================
 RETARDO_RUIDO:
-    ldi cont1, 120
+    ldi cont1, 40
 
 RR1:
     ldi cont2, 255
@@ -262,30 +255,6 @@ RR3:
 
     dec cont1
     brne RR1
-
-    ret
-
-; ==================================================
-; Retardo de parpadeo para alarma total
-; ==================================================
-RETARDO_ALARMA:
-    ldi cont1, 70
-
-RA1:
-    ldi cont2, 255
-
-RA2:
-    ldi cont3, 255
-
-RA3:
-    dec cont3
-    brne RA3
-
-    dec cont2
-    brne RA2
-
-    dec cont1
-    brne RA1
 
     ret
 
