@@ -1,53 +1,73 @@
 .include "m2560def.inc"
 
-.def temp  = r16
-.def cont1 = r17
-.def cont2 = r18
-.def cont3 = r19
+.def temp      = r16
+.def adc_val   = r17
+
+.equ UMBRAL = 15
 
 .cseg
 .org 0x0000
     rjmp RESET
 
 RESET:
+    ;--------------------------------------------------
     ; Inicializar stack pointer
+    ;--------------------------------------------------
     ldi temp, high(RAMEND)
     out SPH, temp
     ldi temp, low(RAMEND)
     out SPL, temp
 
-    ; Configurar PB7 como salida
-    ; En Arduino Mega 2560, PB7 corresponde al pin digital 13
-    sbi DDRB, 7
+    ;--------------------------------------------------
+    ; Configurar LED externo en pin digital 12
+    ; En Arduino Mega 2560, D12 = PB6
+    ;--------------------------------------------------
+    sbi DDRB, 6          ; PB6 como salida
+    cbi PORTB, 6         ; LED apagado al inicio
+
+    ;--------------------------------------------------
+    ; Configurar ADC
+    ; Canal: ADC0 = A0
+    ; Referencia: AVcc
+    ; Ajuste a la izquierda (leeremos ADCH)
+    ; Prescaler: 128
+    ;--------------------------------------------------
+    ldi temp, (1<<REFS0) | (1<<ADLAR)
+    sts ADMUX, temp
+
+    ldi temp, (1<<ADEN) | (1<<ADPS2) | (1<<ADPS1) | (1<<ADPS0)
+    sts ADCSRA, temp
 
 LOOP:
-    ; Encender LED externo (y también el integrado)
-    sbi PORTB, 7
-    rcall DELAY
+    ;--------------------------------------------------
+    ; Iniciar conversión ADC
+    ;--------------------------------------------------
+    lds temp, ADCSRA
+    ori temp, (1<<ADSC)
+    sts ADCSRA, temp
 
-    ; Apagar LED externo (y también el integrado)
-    cbi PORTB, 7
-    rcall DELAY
+ESPERA_ADC:
+    lds temp, ADCSRA
+    sbrc temp, ADSC
+    rjmp ESPERA_ADC
 
+    ;--------------------------------------------------
+    ; Leer resultado de 8 bits desde ADCH
+    ;--------------------------------------------------
+    lds adc_val, ADCH
+
+    ;--------------------------------------------------
+    ; Comparar con umbral
+    ; Si adc_val >= UMBRAL, encender LED
+    ; Si adc_val < UMBRAL, apagar LED
+    ;--------------------------------------------------
+    cpi adc_val, UMBRAL
+    brlo LED_OFF
+
+LED_ON:
+    sbi PORTB, 6
     rjmp LOOP
 
-DELAY:
-    ldi cont1, 255
-
-D1:
-    ldi cont2, 255
-
-D2:
-    ldi cont3, 255
-
-D3:
-    dec cont3
-    brne D3
-
-    dec cont2
-    brne D2
-
-    dec cont1
-    brne D1
-
-    ret
+LED_OFF:
+    cbi PORTB, 6
+    rjmp LOOP
