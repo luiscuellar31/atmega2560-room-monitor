@@ -18,6 +18,12 @@ According to the detected conditions, the system activates different outputs:
 - 5V cooling fan
 - Active buzzer alarm
 
+## Project Objective
+
+The objective of this project was to design and implement an embedded room-monitoring prototype using the ATmega2560 and AVR Assembly, integrating analog sensing and actuator control under predefined alarm conditions.
+
+This work was developed as part of my Embedded Systems course project.
+
 ## Main Features
 
 - Reads three analog sensors through the ADC
