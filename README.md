@@ -46,9 +46,12 @@ If the environment is dark:
 If a strong sound event is detected:
 - Red LED turns on
 
+To improve event visibility, the sound indicator now uses a short hold window:
+- After a valid sound event, the red LED remains active briefly even if the next sample falls below threshold.
+
 ### Alarm Conditions
-- If **two abnormal conditions** are active at the same time, the buzzer sounds intermittently
-- If **three abnormal conditions** are active at the same time, the three LEDs blink and the buzzer behaves like an alarm
+- If **three abnormal conditions** are active at the same time, the buzzer sounds intermittently while active condition LEDs remain on
+- If **zero, one, or two abnormal conditions** are active, the buzzer stays off
 
 ## Hardware Used
 
@@ -83,3 +86,4 @@ If a strong sound event is detected:
 - The LDR was used as the sensor selected for the technical explanation of non-linear behavior.
 - Threshold values were adjusted experimentally during testing.
 - The sound sensor responds better to sharp nearby acoustic events than to continuous speech.
+- Current firmware includes a short noise hold (`HOLD_RUIDO`) to avoid losing brief sound events between ADC cycles.
