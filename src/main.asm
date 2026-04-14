@@ -1,6 +1,6 @@
 .include "m2560def.inc"
 
-.def temp = r16
+.def temp  = r16
 .def cont1 = r17
 .def cont2 = r18
 .def cont3 = r19
@@ -10,29 +10,27 @@
     rjmp RESET
 
 RESET:
-    ; Configurar stack pointer
+    ; Inicializar stack pointer
     ldi temp, high(RAMEND)
     out SPH, temp
     ldi temp, low(RAMEND)
     out SPL, temp
 
     ; Configurar PB7 como salida
+    ; En Arduino Mega 2560, PB7 corresponde al pin digital 13
     sbi DDRB, 7
 
 LOOP:
-    ; Encender LED integrado (PB7 = 1)
+    ; Encender LED externo (y también el integrado)
     sbi PORTB, 7
     rcall DELAY
 
-    ; Apagar LED integrado (PB7 = 0)
+    ; Apagar LED externo (y también el integrado)
     cbi PORTB, 7
     rcall DELAY
 
     rjmp LOOP
 
-;--------------------------------------------------
-; Retardo por software
-;--------------------------------------------------
 DELAY:
     ldi cont1, 255
 
