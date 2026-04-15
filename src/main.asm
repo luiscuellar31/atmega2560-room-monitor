@@ -17,8 +17,8 @@
 ; Umbrales de detección y retención de ruido
 ; ==================================================
 .equ UMBRAL_TEMP   = 15
-.equ UMBRAL_LUZ    = 80
-.equ UMBRAL_RUIDO  = 20
+.equ UMBRAL_LUZ    = 65
+.equ UMBRAL_RUIDO  = 15
 .equ HOLD_RUIDO    = 20
 
 ; ==================================================
