@@ -12,9 +12,9 @@ This project monitors environmental conditions in a small room or study-area mod
 
 According to the detected conditions, the system activates different outputs:
 
-- Temperature LED
+- Red warning LED for high temperature
 - Yellow warning LED for low light
-- Red warning LED for sound events
+- Green warning LED for sound events
 - 5V cooling fan
 - Active buzzer alarm
 
@@ -35,7 +35,7 @@ This work was developed as part of my Embedded Systems course project.
 
 ### Temperature
 If temperature exceeds the configured threshold:
-- Temperature LED turns on
+- Red LED turns on
 - Fan turns on
 
 ### Light
@@ -44,10 +44,10 @@ If the environment is dark:
 
 ### Sound
 If a strong sound event is detected:
-- Red LED turns on
+- Green LED turns on
 
 To improve event visibility, the sound indicator now uses a short hold window:
-- After a valid sound event, the red LED remains active briefly even if the next sample falls below threshold.
+- After a valid sound event, the green LED remains active briefly even if the next sample falls below threshold.
 
 ### Alarm Conditions
 - If **three abnormal conditions** are active at the same time, the buzzer sounds intermittently while active condition LEDs remain on
@@ -75,10 +75,10 @@ To improve event visibility, the sound indicator now uses a short hold window:
 
 ## Output Pins
 
-- `D12` -> Temperature LED
+- `D12` -> Red temperature LED
 - `D11` -> Fan control
-- `D10` -> Light warning LED
-- `D9`  -> Sound warning LED
+- `D10` -> Yellow light warning LED
+- `D9`  -> Green sound warning LED
 - `D8`  -> Buzzer
 
 ## 3D Enclosure Files
