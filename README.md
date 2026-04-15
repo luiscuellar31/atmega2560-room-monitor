@@ -81,6 +81,13 @@ To improve event visibility, the sound indicator now uses a short hold window:
 - `D9`  -> Sound warning LED
 - `D8`  -> Buzzer
 
+## 3D Enclosure Files
+
+The printable enclosure models are located in the `3d/` folder:
+
+- `3d/room-monitor-box.stl` -> Main box
+- `3d/room-monitor-lid.stl` -> Top lid
+
 ## Notes
 
 - The LDR was used as the sensor selected for the technical explanation of non-linear behavior.
