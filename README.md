@@ -83,12 +83,12 @@ To improve event visibility, the sound indicator now uses a short hold window:
 
 ## 3D Enclosure Files
 
-The printable enclosure models are located in the `3d/` folder:
-
-- `3d/room-monitor-box.stl` -> Main box
-- `3d/room-monitor-lid.stl` -> Top lid
+The printable enclosure models are located in the [`3d/`](3d/) folder.
 
 ## Notes
+
+- Presentation files are available in [`docs/`](docs/).
+- Build/reference photos are available in [`img/`](img/).
 
 - The LDR was used as the sensor selected for the technical explanation of non-linear behavior.
 - Threshold values were adjusted experimentally during testing.
