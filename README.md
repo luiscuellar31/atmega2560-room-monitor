@@ -81,15 +81,11 @@ To improve event visibility, the sound indicator now uses a short hold window:
 - `D9`  -> Green sound warning LED
 - `D8`  -> Buzzer
 
-## 3D Enclosure Files
-
-The printable enclosure models are located in the [`3d/`](3d/) folder.
-
 ## Notes
 
 - Presentation files are available in [`docs/`](docs/).
 - Build/reference photos are available in [`img/`](img/).
-
+- The printable enclosure models are available in [`3d/`](3d/).
 - The LDR was used as the sensor selected for the technical explanation of non-linear behavior.
 - Threshold values were adjusted experimentally during testing.
 - The sound sensor responds better to sharp nearby acoustic events than to continuous speech.
