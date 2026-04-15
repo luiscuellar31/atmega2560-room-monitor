@@ -18,7 +18,7 @@
 ; ==================================================
 .equ UMBRAL_TEMP   = 15
 .equ UMBRAL_LUZ    = 80
-.equ UMBRAL_RUIDO  = 30
+.equ UMBRAL_RUIDO  = 20
 .equ HOLD_RUIDO    = 20
 
 ; ==================================================
